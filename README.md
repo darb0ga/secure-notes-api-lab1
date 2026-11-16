@@ -14,6 +14,7 @@ $env:JWT_SECRET = .\.venv\Scripts\python.exe -c "import secrets; print(secrets.t
 .\.venv\Scripts\python.exe app.py
 ```
 
+В PyCharm: **Run → Edit Configurations → app → Environment variables**. Добавьте переменную с именем `JWT_SECRET` и значением из команды `python -c "import secrets; print(secrets.token_hex(32))"`. Значение должно быть длиной не менее 32 символов. После изменения нажмите **Apply** и запустите `app` заново. Секрет не добавляйте в Git.
 
 ## API
 
@@ -56,6 +57,8 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/data -Headers $hea
 
 GitHub Actions запускает тесты, SAST-анализ Bandit и два SCA-аудита при каждом push и pull request: OWASP Dependency-Check формирует HTML-отчёт по `requirements.txt`, а pip-audit дополнительно проверяет разрешённое дерево Python-зависимостей. Dependency-Check завершает проверку с ошибкой при CVSS 7 и выше. HTML-отчёт сохраняется как артефакт запуска в разделе **Actions**.
 
+В Dependency-Check есть одно документированное исключение: CVE-2025-45770 относится к другому пакету `jwt`, но из-за похожего названия ошибочно сопоставлялась с `PyJWT`. Точное правило находится в [`dependency-check-suppressions.xml`](dependency-check-suppressions.xml); остальные уязвимости продолжают проверяться. В [успешном запуске #5](https://github.com/darb0ga/secure-notes-api-lab1/actions/runs/43924861584) выполнены тесты, Bandit, pip-audit и Dependency-Check. [HTML-отчёт Dependency-Check](https://github.com/darb0ga/secure-notes-api-lab1/actions/runs/43924861584/artifacts/14256830263) доступен как артефакт запуска: проверены 2 прямые зависимости, активных уязвимостей 0, одно ложное срабатывание показано в разделе Suppressed Vulnerabilities.
+
 ## Скриншоты проверок
 
 Первый успешный запуск: [Security checks #1](https://github.com/darb0ga/secure-notes-api-lab1/actions/runs/43864411335).
@@ -64,4 +67,4 @@ GitHub Actions запускает тесты, SAST-анализ Bandit и два
 
 ![Вывод Bandit: проблем средней и высокой важности нет; pip-audit: известных уязвимостей нет](evidence/actions-scanners.jpg)
 
-Первый запуск сканеров прошёл успешно. Полный вывод доступен по ссылке на запуск выше.
+Скриншоты выше относятся к первому запуску сканеров. Актуальные результаты с OWASP Dependency-Check находятся в запуске #5 и его HTML-отчёте по ссылкам выше.
