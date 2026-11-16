@@ -57,4 +57,10 @@ GitHub Actions запускает тесты, SAST-анализ Bandit и SCA-а
 
 ## Скриншоты проверок
 
-После первого успешного запуска CI скриншоты вкладки Actions и шагов **SAST - Bandit** / **SCA - pip-audit** сохраняются в `evidence/` и включаются в отчёт.
+Первый успешный запуск: [Security checks #1](https://github.com/darb0ga/secure-notes-api-lab1/actions/runs/43864411335).
+
+![Успешное выполнение тестов, Bandit и pip-audit](evidence/actions-summary.jpg)
+
+![Вывод Bandit: проблем средней и высокой важности нет; pip-audit: известных уязвимостей нет](evidence/actions-scanners.jpg)
+
+Первый запуск сканеров прошёл успешно. Полный вывод доступен по ссылке на запуск выше.

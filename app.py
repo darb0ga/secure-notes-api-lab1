@@ -125,7 +125,7 @@ def create_app(test_config=None):
             app.config["SECRET_KEY"],
             algorithm="HS256",
         )
-        return jsonify(access_token=token, token_type="Bearer", expires_in=1800)
+        return jsonify({"access_token": token, "token_type": "Bearer", "expires_in": 1800})
 
     @app.get("/api/data")
     @require_token
