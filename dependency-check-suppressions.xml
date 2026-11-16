@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.4.xsd">
+  <suppress>
+    <notes><![CDATA[
+      CVE-2025-45770 applies to the separate "jwt" package, version 5.4.3,
+      not the Python package PyJWT. The NVD affected CPE is jwt_project:jwt.
+      https://nvd.nist.gov/vuln/detail/CVE-2025-45770
+    ]]></notes>
+    <packageUrl regex="true">^pkg:pypi/pyjwt@.*$</packageUrl>
+    <cve>CVE-2025-45770</cve>
+  </suppress>
+</suppressions>

@@ -33,6 +33,7 @@ jobs:
           args: >
             --failOnCVSS 7
             --enableExperimental
+            --suppression dependency-check-suppressions.xml
       - name: Save Dependency-Check report
         if: always()
         uses: actions/upload-artifact@v6
