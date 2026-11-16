@@ -1,6 +1,6 @@
 # Secure Notes API
 
-Уучебный REST API для лабораторной работы № 1 по информационной безопасности. Пользователь входит в систему и работает только со своими заметками. Данные хранятся в SQLite.
+Учебный REST API для лабораторной работы № 1 по информационной безопасности. Пользователь входит в систему и работает только со своими заметками. Данные хранятся в SQLite.
 
 ## Запуск
 
@@ -9,7 +9,7 @@
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-$env:JWT_SECRET = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+$env:JWT_SECRET = .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))"
 .\.venv\Scripts\python.exe create_user.py
 .\.venv\Scripts\python.exe app.py
 ```
@@ -29,7 +29,9 @@ $env:JWT_SECRET = [Convert]::ToHexString([Security.Cryptography.RandomNumberGene
 $login = Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/auth/login -ContentType 'application/json' -Body '{"username":"alice","password":"ваш_пароль"}'
 $headers = @{ Authorization = "Bearer $($login.access_token)" }
 Invoke-RestMethod -Uri http://127.0.0.1:5000/api/data -Headers $headers
-Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/data -Headers $headers -ContentType 'application/json' -Body '{"title":"Первая заметка","body":"Учебный текст"}'
+$noteJson = @{title='Первая заметка'; body='Учебный текст'} | ConvertTo-Json -Compress
+$noteBytes = [System.Text.Encoding]::UTF8.GetBytes($noteJson)
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/data -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $noteBytes
 ```
 
 Без токена защищённые методы отвечают `401`. Для ошибочного логина или токена также возвращается `401`. Размер запроса ограничен 16 КБ, длина заголовка заметки — 200 символами, текста - 2000 символами.
@@ -52,7 +54,7 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/data -Headers $hea
 .\.venv\Scripts\pip-audit.exe -r requirements.txt
 ```
 
-GitHub Actions запускает тесты, SAST-анализ Bandit и SCA-аудит зависимостей pip-audit при каждом push и pull request. Результаты доступны на вкладке **Actions** репозитория.
+GitHub Actions запускает тесты, SAST-анализ Bandit и два SCA-аудита при каждом push и pull request: OWASP Dependency-Check формирует HTML-отчёт по `requirements.txt`, а pip-audit дополнительно проверяет разрешённое дерево Python-зависимостей. Dependency-Check завершает проверку с ошибкой при CVSS 7 и выше. HTML-отчёт сохраняется как артефакт запуска в разделе **Actions**.
 
 ## Скриншоты проверок
 

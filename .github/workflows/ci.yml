@@ -4,12 +4,15 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test-and-scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - name: Install dependencies
@@ -20,3 +23,20 @@ jobs:
         run: bandit -r app.py create_user.py -ll
       - name: SCA - pip-audit
         run: pip-audit -r requirements.txt
+      - name: SCA - OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: secure-notes-api
+          path: requirements.txt
+          format: HTML
+          out: reports
+          args: >
+            --failOnCVSS 7
+            --enableExperimental
+      - name: Save Dependency-Check report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: dependency-check-report
+          path: reports/dependency-check-report.html
+          if-no-files-found: warn
